@@ -8,7 +8,7 @@ provider:
   stage: ${opt:stage, "development"}
 
   environment:
-    ACTIVE_TOURNAMENT_KEYS: ${self:provider.stage}-activeTournamentKeys
+    AQUARIUM_TABLE: ${self:provider.stage}-aquariumTable
 
 
   iamRoleStatements:
@@ -19,15 +19,23 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.ACTIVE_TOURNAMENT_KEYS}"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.AQUARIUM_TABLE}"
 
 #lambdas 
 functions: 
-  testLambda:
-    handler: source/test.handler
+  getTemperature:
+    handler: source/getTemperature.handler
     events:
       - http:
-          path: testLambda/{blahblah}
+          path: getTemperature/{aquariumId}
+          method: get
+          cors: true
+
+  getAquaFlag:
+    handler: source/getAquaFlag.handler
+    events:
+      - http:
+          path: getAquaFlag/{aquariumId}
           method: get
           cors: true
 
@@ -37,12 +45,12 @@ resources:
     activeTournamentKeys:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.ACTIVE_TOURNAMENT_KEYS}
+        TableName: ${self:provider.environment.AQUARIUM_TABLE}
         AttributeDefinitions:
-          - AttributeName: key
+          - AttributeName: aquariumId
             AttributeType: S
         KeySchema:
-          - AttributeName: key
+          - AttributeName: aquariumId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

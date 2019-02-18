@@ -24,6 +24,7 @@
         "mobx-react": "^5.2.8",
         "react": "^16.5.2",
         "react-dom": "^16.5.2",
+        "react-toggle": "^4.0.2",
         "uuid": "^3.3.2"
     },
     "devDependencies": {
