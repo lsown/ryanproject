@@ -39,6 +39,14 @@ functions:
           method: get
           cors: true
 
+  getAllFlags:
+    handler: source/getAllFlags.handler
+    events:
+      - http:
+          path: getAllFlags/{aquariumId}
+          method: get
+          cors: true
+
 #dynamos
 resources:
   Resources:

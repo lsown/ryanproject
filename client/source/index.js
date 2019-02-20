@@ -3,10 +3,12 @@
 const React = require("react")
 const ReactDOM = require("react-dom")
 const MobxReact = require("mobx-react")
-const ReactToggle = require("react-toggle")
+
+import ReactToggle from 'react-toggle'
+
 
 require("./index.less") 
-
+require("react-toggle/style.css")
 
 
   
@@ -77,9 +79,9 @@ require("./index.less")
         /*We want a switch that  toggles on / off and also pulls info on last known state of the device*/
     }
 
-/*
+
     onGetAllFlagsClick(event) {
-        window.fetch("https://ef6c1se05k.execute-api.us-west-2.amazonaws.com/development/getAquaFlag/ryan", {
+        window.fetch("https://ef6c1se05k.execute-api.us-west-2.amazonaws.com/development/getAllFlags/ryan", {
             headers: {
                 "Content-Type": "application/json"
             },
@@ -87,15 +89,15 @@ require("./index.less")
         }).then((response) => {
             return response.json() //unpacks into a readable json format
         }).then((response) => {
-            console.log(response.flagPacket)
+            console.log(response)
             this.state.aquaFlag = response.aquaFlag // updates aquaFlag
-            this.state.aquaFlag = response.feedFlag // updates aquaFlag
-            this.state.aquaFlag = response.takeupFlag // updates aquaFlag
-            this.state.aquaFlag = response.overflowFlag // updates aquaFlag
+            this.state.feedFlag = response.feedFlag // updates aquaFlag
+            this.state.takeupFlag = response.takeupFlag // updates aquaFlag
+            this.state.overflowFlag = response.overflowFlag // updates aquaFlag
             this.setState(this.state) // re-renders
         }).catch((error) => {console.log(error)})
     }
-*/
+
 
     render() {
         return (
@@ -109,7 +111,7 @@ require("./index.less")
                         <ul>
                             <li>Temperature: <span className="temp">{this.state.temperature}</span></li>
                             <li>Aquarium H2O Level: <span className="aquaFlag">{this.state.aquaFlag}</span></li>
-                            <li>OverFlow Report: <span className="overflowFlag">{this.state.overflowFlag}</span></li>
+                            <li>Takeup Flag: <span className="takeupFlag">{this.state.takeupFlag}</span></li>
                         </ul>
                         <li>Water Exchange Status</li>
                         <ul>
@@ -134,6 +136,7 @@ require("./index.less")
                     </ul>
                     <button onClick={(event) => {this.onGetTemperatureClick(event)}}>get temperature {this.state.counter}</button>
                     <button onClick={(event) => {this.onGetAquaFlagClick(event)}}>get AquaFlag {this.state.counter}</button>
+                    <button onClick={(event) => {this.onGetAllFlagsClick(event)}}>get All Flags {this.state.counter}</button>
                 </div>   
                 <div>
                     <ReactToggle

@@ -22,8 +22,6 @@ module.exports.handler = (e, c, cb) => { Common.handler(e, c, cb, async (event, 
         console.log(response.Item.aquaFlag)
         console.log(response.Item.aquaFlag)
         console.log(flagPacket)
-        return {
-            flagPacket
-        }
+        return flagPacket
     })
 })}
