@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "/Users/lsown/code/arduino-esp32-master"
 		}
 	],
 	"settings": {}

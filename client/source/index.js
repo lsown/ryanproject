@@ -5,11 +5,23 @@ const ReactDOM = require("react-dom")
 const MobxReact = require("mobx-react")
 
 import ReactToggle from 'react-toggle'
+import RCSwitch from 'rc-switch';
+import Amplify from "aws-amplify"
+import API from "@aws-amplify/api"
 
+const config = require("aws-exports.js")
+
+import { withAuthenticator } from "aws-amplify-react"
+
+import { Auth } from 'aws-amplify';
+
+//console.log(Amplify)
+
+Amplify.configure(config)
 
 require("./index.less") 
 require("react-toggle/style.css")
-
+require("rc-switch/assets/index.css")
 
   
 @MobxReact.observer class Main extends React.Component {
@@ -26,7 +38,12 @@ require("react-toggle/style.css")
             disabled: false //button toggle
         }
         /*button toggle code*/
-        
+        Auth.currentSession()
+            .then((data) => {
+                console.log(data)
+                this.idToken = data.idToken
+            })
+            .catch(err => console.log(err));        
 
     }
 
@@ -41,19 +58,16 @@ require("react-toggle/style.css")
     
 
     onGetTemperatureClick(event) {
-        window.fetch("https://ef6c1se05k.execute-api.us-west-2.amazonaws.com/development/getTemperature/ryan", {
-            headers: {
-                "Content-Type": "application/json"
-            },
-            method: "GET"
-        }).then((response) => {
-            return response.json() //unpacks into a readable json format
-        }).then((response) => {
-            console.log(response.temperature)
-            this.state.temperature = response.temperature // updates temp
-            this.setState(this.state) // re-renders
-        }).catch((error) => {console.log(error)})
-    }
+        console.log("Bearer ", this.idToken.jwtToken)
+            return API.post("testApi", "/ryan").then((response) => {
+                console.log(response)
+                this.state.temperature = JSON.parse(response.body).temperature // updates Aqua Flag
+
+                this.setState(this.state) // re-renders
+            }).catch((error) => {
+                console.log("test", error)
+            })
+        }
 
     onGetAquaFlagClick(event) {
         window.fetch("https://ef6c1se05k.execute-api.us-west-2.amazonaws.com/development/getAquaFlag/ryan", {
@@ -145,6 +159,15 @@ require("react-toggle/style.css")
                         disabled={this.state.feedPump === true}
                         value="Feed Pump"
                     />
+                </div>
+                <div>
+                    <RCSwitch
+                        onChange={() => this.onChange()}
+                        onClick={() => this.onChange()}
+                        disabled={this.state.feedPump === true}
+                        checkedChildren="I"
+                        unCheckedChildren="O"
+                    />
                 
                     <div>
                         <button onClick={(event) => {this.toggle(event)}}>toggle disabled</button>
@@ -156,8 +179,9 @@ require("react-toggle/style.css")
 }
 
 
+let AmplifyMainContent = withAuthenticator(Main)
 
 ReactDOM.render(
-    <Main />,
+    <AmplifyMainContent />,
     document.getElementById("mount")
 )

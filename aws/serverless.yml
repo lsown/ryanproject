@@ -4,7 +4,7 @@ service: ryanproject
 provider:
   name: aws
   runtime: nodejs8.10
-  region: us-west-2
+  region: eu-central-1
   stage: ${opt:stage, "development"}
 
   environment:
@@ -28,8 +28,14 @@ functions:
     events:
       - http:
           path: getTemperature/{aquariumId}
-          method: get
+          method: post
           cors: true
+          integration: lambda
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:eu-central-1:893617306237:userpool/eu-central-1_riYRWIf8j
+            claims:
+              - email
 
   getAquaFlag:
     handler: source/getAquaFlag.handler
@@ -38,6 +44,8 @@ functions:
           path: getAquaFlag/{aquariumId}
           method: get
           cors: true
+          authorizer: aws_iam
+
 
   getAllFlags:
     handler: source/getAllFlags.handler
@@ -46,6 +54,8 @@ functions:
           path: getAllFlags/{aquariumId}
           method: get
           cors: true
+          authorizer: aws_iam
+
 
 #dynamos
 resources:
@@ -63,4 +73,18 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-   
+    ApiGatewayAuthorizer: 
+      Type: AWS::ApiGateway::Authorizer
+      Properties: 
+        Name: nwx-authorizer
+        Type: COGNITO_USER_POOLS
+        IdentitySource: method.request.header.Authorization
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ProviderARNs: 
+          - Fn::GetAtt:
+              - UserPool
+              - Arn
+
+    UserPool:
+      Type: AWS::Cognito::UserPool
